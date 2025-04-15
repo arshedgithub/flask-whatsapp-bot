@@ -1,6 +1,5 @@
-from flask import Flask
-import os
-from twilio import Client
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 
@@ -8,16 +7,16 @@ app = Flask(__name__)
 def home():
     return 'WA-Bot Deployed Successfully!'
 
-@app.route('/about')
-def about():
-    return 'About'
+@app.route('/whatsapp', methods=["POST"])
+def reply_whatsapp():
+    incoming_msg = request.values.get('Body', '').strip().lower()
+    resp = MessagingResponse()
+    msg = resp.message()
 
-# account_sid = os.getenv('ACCOUNT_SID')
-# auth_token = os.getenv('AUTH_TOKEN')
+    if incoming_msg in ['hi', 'hello']:
+        msg.body("Hello! How can I assist you today?")
+    else:
+        msg.body("I'm here to help! Please type your question.")
 
-# client = Client(account_sid, auth_token)
-
-# from_wa_number = 'whatsapp:' + os.getenv('TWILIO_NUMBER')
-# to_wa_number = 'whatsapp:' + os.getenv('RECIEPTANT_NUMBER')
-
-# client.messages.create(body='Hello Testing WA bot!', to=to_wa_number, from_=from_wa_number)
+    return str(resp)
+    
